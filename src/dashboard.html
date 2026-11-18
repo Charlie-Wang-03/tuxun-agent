@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><title>图寻 Agent · 地理探索工作台</title><script>try{const p=JSON.parse(localStorage.getItem("tuxun-dashboard-preferences")||"{}");document.documentElement.dataset.theme=(p.theme==="dark"||((!p.theme||p.theme==="system")&&matchMedia("(prefers-color-scheme: dark)").matches))?"dark":"light";}catch{document.documentElement.dataset.theme=matchMedia("(prefers-color-scheme: dark)").matches?"dark":"light";}</script><link rel="stylesheet" href="/dashboard.css"></head><body>
+<a class="skip-link" href="#main">跳转到主要内容</a>
+<header class="app-header">
+  <a class="brand" href="#main" aria-label="图寻 Agent 本地工作台"><span class="brand-mark"><svg viewBox="0 0 48 48" fill="none" aria-hidden="true"><circle cx="24" cy="24" r="20" stroke="currentColor"/><path d="M24 6v5m18 13h-5M24 42v-5M6 24h5" stroke="currentColor"/><path d="m30 15-3 12-12 6 6-12z" fill="currentColor"/><circle cx="24" cy="24" r="2" fill="#f8f5eb"/></svg></span><span>图寻 Agent<small>地理探索工作台</small></span></a>
+  <nav aria-label="工作区"><button id="runTab" class="nav-button" aria-pressed="true">运行</button><button id="replayTab" class="nav-button" aria-pressed="false">复盘</button></nav>
+  <div class="header-actions"><div class="preferences"><button id="languageToggle" class="preference-button" type="button" aria-label="切换为英文" title="切换为英文"><span id="languageTarget">EN</span></button><button id="themeToggle" class="preference-button" type="button" aria-label="当前：跟随系统；点击切换为亮色" title="当前：跟随系统；点击切换为亮色"><svg data-mode="light" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" aria-hidden="true" hidden><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M5 5l1.5 1.5m11 11L19 19M5 19l1.5-1.5m11-11L19 5"/></svg><svg data-mode="dark" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" hidden><path d="M20.5 14A8.5 8.5 0 0 1 10 3.5 8.5 8.5 0 1 0 20.5 14Z"/></svg><svg data-mode="system" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="13" rx="2"/><path d="M8 21h8m-4-4v4"/></svg></button></div><button id="newRun" hidden>配置新运行</button><button id="logsButton" class="quiet">探索记录 ↗</button><span id="status" class="badge" role="status" aria-live="polite">正在连接</span><button id="stop" class="stop" disabled>停止运行</button></div>
+</header>
+<main id="main" tabindex="-1">
+<div class="connection-line"><span id="connectionStatus">控制台 · 正在连接</span><span id="workspaceSource">真实游戏 · 只读预览</span></div>
+<div class="alerts"><div id="connectionWarning" class="notice warning" role="status" hidden></div><div id="actionError" class="notice danger" role="alert" hidden></div><div id="stopNotice" class="notice warning" role="status" hidden></div></div>
+<div id="welcomeTitle" class="welcome-title"><div><h1 id="workspaceTitle">运行准备</h1><p id="nextStep" class="muted">等待本机服务连接。</p></div></div>
+  <section id="setup" class="panel setup" aria-labelledby="setupTitle">
+    <div class="section-heading"><div><p class="eyebrow">RUN CONFIGURATION</p><h1 id="setupTitle">运行配置</h1><p class="muted">与网站的模式、轮次时间保持一致。</p></div><span class="badge">经典五题</span></div>
+    <div class="readiness"><strong id="previewReady">程序检查 · 等待可读取的游戏预览</strong><span>预览不验证网站模式、计时或模型登录。</span></div>
+    <form id="setupForm">
+      <fieldset class="mode-options"><legend>与网站保持相同的模式</legend>
+        <label class="mode-card"><input type="radio" name="mode" value="fixed" checked><span><strong>固定</strong><small>可转向、缩放 · 不可移动</small></span></label>
+        <label class="mode-card"><input type="radio" name="mode" value="move"><span><strong>移动</strong><small>可转向、缩放和移动</small></span></label>
+        <label class="mode-card"><input type="radio" name="mode" value="fixed-view"><span><strong>固定视角</strong><small>不转向、不缩放、不移动</small></span></label>
+      </fieldset>
+      <div class="fields"><label>运行局数<input id="games" type="number" value="1" min="1" step="1" required><small>每局五题</small></label><label>单题时限（分钟）<input id="round" type="number" value="5" min="1" step="1" required><small id="roundHint">每题 5 分钟</small></label><label>单局时限（分钟）<input id="total" type="number" value="30" min="1" step="1" required><small id="totalHint">每局最多 30 分钟，新局重置</small></label></div>
+      <button id="advancedButton" class="text-button" type="button">操作上限与预算说明 ↗</button>
+      <div class="confirm-box"><strong id="configSummary">固定 · 1 局 / 5 题 · 每题 5 分钟 · 每局最多 30 分钟</strong>
+        <label class="check"><input id="manualReady" type="checkbox"><span>已在题库经典五题开局，核对模式和网站计时；不用于每日挑战或匹配。</span></label>
+        <label class="check"><input id="authorize" type="checkbox"><span>授权上述范围内的真实选点；截图发送至 Codex CLI 后端，可能产生费用。</span></label>
+        <div class="form-footer"><span class="muted">停止会阻止后续输入；已发出的操作仍可能完成。</span><button id="start" class="primary" type="submit" disabled>确认并启动</button></div>
+      </div>
+    </form>
+  </section>
+  <section id="replaySetup" class="panel replay-setup" hidden aria-labelledby="replayTitle">
+    <div class="section-heading"><div><p class="eyebrow">FIELD NOTES / 离线复盘</p><h1 id="replayTitle">导入运行记录</h1><p class="muted">选择含一份 events.jsonl 和截图的运行目录。文件仅由本机浏览器读取。</p></div></div>
+    <div class="replay-import"><label class="file-picker">选择运行目录<input id="replayFiles" class="sr-only" type="file" webkitdirectory multiple></label></div>
+    <p id="replayLoadStatus" role="status" class="muted">还没有载入记录。回放不会操作游戏或调用模型。</p>
+  </section>
+  <section id="endPanel" class="notice end-panel" hidden aria-labelledby="endTitle"><div><strong id="endTitle">本次运行已结束</strong><p id="endReason"></p><p id="endStats" class="muted"></p></div><button id="openReview">查看离线复盘</button></section>
+<section id="replayControls" hidden aria-label="回放控制">
+  <div class="replay-heading"><div><p id="provenance" class="provenance"></p><p id="replayRecordInfo" class="muted caption"></p></div><div class="replay-file-actions"><button id="changeReplay">更换记录</button><button id="replayExit" disabled>关闭记录</button></div></div>
+  <div class="playback-deck panel"><div class="playback"><button id="replayPause" class="primary">播放回放</button><label>事件速度<select id="replaySpeed"><option value="2">2 事件/秒</option><option value="4">4 事件/秒</option><option value="8" selected>8 事件/秒</option><option value="16">16 事件/秒</option></select></label><label class="seek">事件 <span id="replayProgress">0 / 0</span><input id="replayPosition" type="range" min="0" max="0" value="0"></label><label>局<select id="replayGame"></select></label></div><div id="roundNav" class="round-nav" aria-label="按题跳转"></div></div>
+</section>
+<section id="monitor" aria-label="运行观察与事件详情">
+<div class="monitor-phase"><span>当前阶段</span><strong id="phaseOverview">等待运行</strong></div>
+    <div class="metrics">
+      <div><span>局 / 题</span><strong id="roundValue">等待题目</strong></div>
+      <div><span>单题剩余 · 约</span><strong id="budget">未开始</strong></div>
+      <div><span>剩余操作</span><strong id="actionBudget">未开始</strong></div>
+      <div><span>单局剩余 · 约</span><strong id="gameBudget">未开始</strong></div>
+    </div>
+<div class="workspace">
+      <section class="panel preview-panel" aria-labelledby="previewTitle"><div class="panel-heading"><h2 id="previewTitle">街景与地图</h2><span class="muted">只读画面</span></div><div class="screen"><img id="frame" alt="专用浏览器游戏画面" hidden><div id="frameEmpty" class="empty"><svg class="atlas-art" viewBox="0 0 760 390" fill="none" aria-hidden="true">
+<defs><pattern id="grid" width="38" height="38" patternUnits="userSpaceOnUse"><path d="M38 0H0V38" stroke="#d5dfcf" stroke-width=".7"/></pattern></defs>
+<rect width="760" height="390" fill="url(#grid)"/>
+<g fill="#dde8ce" stroke="#a7bd9d"><path d="M-30 95C95 18 194 66 218 120S192 227 88 261-32 246-30 95Z"/><path d="M525-20c-94 61-74 132 14 145s150 80 261 14V-20Z"/><path d="M436 318c-18-55 80-107 151-72s121 73 91 164H435Z"/></g>
+<g stroke="#a7bd9d" opacity=".65"><path d="M-30 120C75 56 168 91 183 139S148 214 72 230"/><path d="M-30 143c95-60 158-23 165 9s-30 39-83 52"/><path d="M539-18c-65 50-55 108 11 111s150 77 235 16"/><path d="M472 395c-38-59 22-120 91-120s132 84 83 127"/><path d="M506 395c-20-40 10-90 55-88s87 57 54 89"/></g>
+<path d="M350-20c-85 91 45 105-16 187S220 244 271 410" stroke="#b9d9dc" stroke-width="29"/><path d="M350-20c-85 91 45 105-16 187S220 244 271 410" stroke="#91bdc3" stroke-width="1"/>
+<path d="M86 289c112-2 110-149 218-133s100 110 181 63 109-24 173-104" stroke="#fcfaf2" stroke-width="14"/><path d="M86 289c112-2 110-149 218-133s100 110 181 63 109-24 173-104" stroke="#758a70" stroke-width="1.4"/>
+<path d="M115 289c91-8 100-147 189-133s100 110 181 63 109-24 153-80" stroke="#b85e37" stroke-width="3" stroke-dasharray="5 8"/>
+<g fill="#fdfaf0" stroke="#2b624a" stroke-width="2"><circle cx="115" cy="289" r="10"/><circle cx="242" cy="162" r="10"/><circle cx="396" cy="214" r="10"/><circle cx="502" cy="211" r="10"/></g>
+<path d="M638 100a20 20 0 0 0-20 20c0 15 20 33 20 33s20-18 20-33a20 20 0 0 0-20-20Z" fill="#c96c43"/><circle cx="638" cy="120" r="6" fill="#fff7e6"/>
+<g fill="#2b624a"><path d="m86 141 10-21 10 21h-8v9h-4v-9Zm28 14 10-21 10 21h-8v9h-4v-9Zm482 175 10-21 10 21h-8v9h-4v-9Z"/><path d="m547 69 11-17 12 17Zm24 0 14-24 17 24Z"/></g>
+<g transform="translate(688 315)" stroke="#3b6857"><circle r="29"/><path d="M0-39v9m0 60v9m-39-39h9m60 0h9"/><path d="m0-20 6 20-6 20-6-20Z" fill="#3b6857"/><path d="M0 0v20l6-20Z" fill="#e9efdb"/></g>
+</svg><div class="atlas-caption"><span class="map-stamp">无可用画面</span><strong id="emptyTitle">尚未取得游戏预览</strong><p id="emptyHelp">请在专用 Chrome 中手动登录并开始经典五题，随后等待预览更新。</p><small>探索示意图 · 不是真实地图或当前题目线索</small></div></div></div><p id="frameStatus" class="frame-status">尚未取得预览</p><span id="frameHealth" class="sr-only" role="status"></span></section>
+<aside id="inspector" class="inspector panel">
+  <nav class="inspector-nav" aria-label="观察记录"><button id="notesTab" aria-pressed="true">观察手记</button><button id="eventsTab" aria-pressed="false">事件</button><button id="roundTab" aria-pressed="false" hidden>本题摘要</button></nav>
+  <div class="inspector-body">      <section id="agentPane" class="panel agent-panel" aria-labelledby="agentTitle"><div class="panel-heading"><h2 id="agentTitle">观察手记</h2><span class="muted">基于记录</span></div><div class="phase-block"><span class="eyebrow">当前阶段</span><strong id="phase" role="status">尚未启动</strong><span id="phaseElapsed" class="muted"></span></div>
+        <div class="agent-block"><h3>最近观察</h3><p id="observation">等待模型返回可见线索。</p></div>
+        <div class="agent-block"><h3>动作与依据</h3><p id="decision">尚无动作计划。</p><p id="decisionReason" class="muted"></p></div>
+        <div class="agent-block"><h3>执行反馈</h3><p id="actionResult">尚无执行结果</p><p id="fallback" class="warning-text" hidden></p></div>
+        <div class="audit"><strong id="auditStatus">图钉核对：暂无记录</strong><p id="auditReason">尚无核对原因。</p><p class="muted caption">只比较图钉与目标描述，不证明街景判断正确。定位以提交后的结果验证。</p></div>
+      </section>
+    <section id="eventsPane" class="panel events-panel" hidden><div class="panel-heading"><h2>事件时间线</h2><span id="timelineHint" class="muted">最近的关键事件</span></div><ol id="timeline" class="timeline"></ol><div id="selectedEvent" class="selected-event" hidden></div></section>
+  <section id="roundPane" class="round-pane" hidden><p class="eyebrow">ROUND REVIEW</p><h2>本题结果与用量</h2><div id="roundReview" class="round-review"></div><p class="muted caption">摘要依据整份记录，画面对应当前事件。不同随机题目的成绩不能直接比较模型或模式。</p></section></div>
+</aside></div>
+<div class="route-board"><span class="route-label">本局五题进度</span><div id="scoreBoard" class="score-board" aria-label="本局各题"></div></div>
+</section>
+<div id="readinessSummary" class="readiness-summary" aria-label="准备检查"><div><span id="checkLabel0">本机服务</span><strong id="checkValue0">等待连接</strong></div><div><span id="checkLabel1">游戏预览</span><strong id="checkValue1">等待画面</strong></div><div><span id="checkLabel2">网页设置</span><strong id="checkValue2">待人工核对</strong></div><div><span id="checkLabel3">运行授权</span><strong id="checkValue3">待确认</strong></div></div>
+<footer><span>本地控制台</span><span>预览可读不代表网站设置或模型登录已核实</span></footer>
+</main>
+<dialog id="logsDialog" class="log-dialog"><div class="dialog-heading"><div><p class="eyebrow">EXPEDITION LOG</p><h2>探索记录</h2></div><button id="closeLogs" aria-label="关闭探索记录">关闭 ✕</button></div><div id="runSummary" class="run-summary" hidden><span id="runningConfig"></span></div>    <details id="runDetails" class="panel run-details"><summary>用量、状态与原始记录</summary><div class="details-grid"><div><span>模式</span><strong id="modeValue">未记录</strong></div><div><span>最近记录总分</span><strong id="scoreValue">未记录</strong></div><div><span>已记录 token · 不等同于费用</span><strong id="tokens">未记录</strong></div><div><span>状态</span><strong id="outcome">尚未启动</strong></div></div><p class="muted">模型 / 推理强度：未知。当前 CLI 输出不能可靠确认实际生效值。用量缺失时保留未知；旧版与新版口径混合时不合计。下方仅显示返回的观察、理由和事件，不展示内部推理。</p><p id="logHint" class="muted">最近 120 行运行输出。完整事件记录可按需载入。</p><button id="loadFullLog">载入本次完整事件日志</button><a id="downloadReplayLog" download="events.jsonl" hidden>另存完整原始日志</a><pre id="fullLog" class="log" tabindex="0" aria-label="完整事件日志快照" hidden></pre><pre id="log" class="log" tabindex="0" aria-label="运行事件日志"></pre></details></dialog>
+<dialog id="advancedDialog" class="advanced-dialog"><div class="dialog-heading"><h2>操作预算</h2><button id="closeAdvanced" aria-label="关闭操作预算">关闭 ✕</button></div><label>每题操作上限<input id="actions" form="setupForm" type="number" value="35" min="1" step="1" required></label><p>计入地图操作与部分自动操作，每题重置。每局时间上限独立重置，时限和操作数均不等同于费用上限。</p><p class="muted">修改后需要重新核对启动确认。</p></dialog>
+<script>const token='__DASHBOARD_TOKEN__'; import('/dashboard-client.mjs').then(({mountDashboard})=>mountDashboard({token})).catch(()=>{document.getElementById('status').textContent='界面加载失败，请刷新';});</script>
+</body></html>

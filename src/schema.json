@@ -1,0 +1,59 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "hover",
+        "map_control",
+        "map_scroll",
+        "map_select",
+        "select_and_review",
+        "click",
+        "drag",
+        "scroll",
+        "move_arrow",
+        "move_road",
+        "finish",
+        "stop",
+        "return_to_street"
+      ]
+    },
+    "x": {
+      "type": "number"
+    },
+    "y": {
+      "type": "number"
+    },
+    "endX": {
+      "type": "number"
+    },
+    "endY": {
+      "type": "number"
+    },
+    "delta": {
+      "type": "number"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "round": {
+      "type": "integer"
+    },
+    "observation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "x",
+    "y",
+    "endX",
+    "endY",
+    "delta",
+    "reason",
+    "round",
+    "observation"
+  ]
+}

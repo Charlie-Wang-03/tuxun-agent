@@ -1,0 +1,32 @@
+{
+  "name": "tuxun-agent",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "doctor": "node src/doctor.mjs",
+    "browser": "node src/cli.mjs browser",
+    "headless": "node src/cli.mjs headless",
+    "run": "node src/cli.mjs run",
+    "stop": "node src/cli.mjs stop",
+    "dashboard": "node src/dashboard.mjs",
+    "review": "node src/review-cli.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:preview": "node test/integration/preview-smoke.mjs",
+    "test:dashboard": "node test/integration/dashboard-ux-smoke.mjs",
+    "test:stop": "node test/integration/stop-smoke.mjs",
+    "test:stop-input": "node test/integration/stop-smoke.mjs --inflight-input",
+    "test:runtime": "node test/integration/runtime-smoke.mjs",
+    "test:page-state": "node test/integration/page-state-smoke.mjs",
+    "test:map-capture": "node test/integration/stop-smoke.mjs --map-only-capture",
+    "test:evidence": "node test/integration/evidence-smoke.mjs",
+    "test:capture-failure": "node test/integration/stop-smoke.mjs --capture-failure",
+    "test:submit": "node test/integration/stop-smoke.mjs --synthetic-submit",
+    "test:clean": "node test/integration/clean-smoke.mjs",
+    "test:dual-remote": "node test/integration/dual-remote-smoke.mjs",
+    "test:restart": "node test/integration/stop-smoke.mjs --restart-complete"
+  }
+}

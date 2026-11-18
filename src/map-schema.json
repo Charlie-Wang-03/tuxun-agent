@@ -1,0 +1,51 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": [
+        "map_scroll",
+        "map_select",
+        "select_and_review",
+        "return_to_street",
+        "stop"
+      ]
+    },
+    "x": {
+      "type": "number"
+    },
+    "y": {
+      "type": "number"
+    },
+    "endX": {
+      "type": "number"
+    },
+    "endY": {
+      "type": "number"
+    },
+    "delta": {
+      "type": "number"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "round": {
+      "type": "integer"
+    },
+    "observation": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "type",
+    "x",
+    "y",
+    "endX",
+    "endY",
+    "delta",
+    "reason",
+    "round",
+    "observation"
+  ]
+}

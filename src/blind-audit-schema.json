@@ -1,0 +1,1 @@
+{"type":"object","additionalProperties":false,"properties":{"country_code":{"type":"string"},"certainty":{"type":"string","enum":["visible","uncertain"]},"reason":{"type":"string"}},"required":["country_code","certainty","reason"]}

@@ -1,0 +1,49 @@
+{
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "verdict": {
+      "type": "string",
+      "enum": [
+        "match",
+        "mismatch",
+        "uncertain"
+      ]
+    },
+    "marker": {
+      "type": "string"
+    },
+    "reason": {
+      "type": "string"
+    },
+    "has_correction": {
+      "type": "boolean"
+    },
+    "correction_x": {
+      "type": "number"
+    },
+    "correction_y": {
+      "type": "number"
+    },
+    "evidence_label": {
+      "type": "string"
+    },
+    "approximate_ok": {
+      "type": "boolean"
+    },
+    "target_country_code": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "verdict",
+    "marker",
+    "reason",
+    "has_correction",
+    "correction_x",
+    "correction_y",
+    "evidence_label",
+    "approximate_ok",
+    "target_country_code"
+  ]
+}
