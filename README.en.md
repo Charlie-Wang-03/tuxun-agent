@@ -2,7 +2,7 @@
 
 A Windows-local experiment for developers studying visual agents. The agent reads a street view, compass and map, places a guess, and records the observations and actions that led to submission. Use it only for classic five-round games in the map library. Daily challenges, matchmaking and other competitive modes are outside the project scope.
 
-[简体中文](README.md) · [Code and tests](CONTRIBUTING.md) · [License](LICENSE)
+[简体中文](README.md) · [Code and tests](CONTRIBUTING.md) · [License](LICENSE) · [Documentation index for LLMs](llms.txt)
 
 ## Try it offline
 

@@ -1,0 +1,10 @@
+# 图寻 Agent (TuXun Agent)
+
+> 在 Windows 上观察街景、选点并复盘的视觉 Agent 实验。TuXun Agent uses Codex CLI to play classic five-round map-library games in a dedicated Chrome window.
+
+## Documentation
+
+- [模式与边界 · Game modes](https://raw.githubusercontent.com/Charlie-Wang-03/tuxun-agent/main/README.md): See “模式与边界” for the street-view actions allowed in fixed, move and fixed-view modes. Daily challenges and matchmaking are outside the project scope.
+- [运行数据流向 · Data flow](https://raw.githubusercontent.com/Charlie-Wang-03/tuxun-agent/main/SECURITY.md): Live decisions send screenshots and round context to the Codex CLI backend. Read-only replay reads local files without calling the model.
+- [四类验证证据 · Evidence types](https://raw.githubusercontent.com/Charlie-Wang-03/tuxun-agent/main/CONTRIBUTING.md): Distinguishes log replay, simulation, historical-image model evaluation and live games. The README’s “验证状态与文档” section summarizes what has been tested live.
+- [UI 验收 · Dashboard evidence](https://raw.githubusercontent.com/Charlie-Wang-03/tuxun-agent/main/test/UI_UX_ACCEPTANCE.md): Records simulated viewport checks, human visual review and the limits of each.
