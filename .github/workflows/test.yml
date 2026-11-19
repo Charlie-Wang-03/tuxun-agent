@@ -20,4 +20,17 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node }}
-      - run: npm test
+      - name: Install locked dependencies
+        run: npm ci --ignore-scripts
+      - name: Verify project Codex CLI
+        run: |
+          @'
+          import assert from 'node:assert/strict';
+          import { resolveCodexRuntime } from './src/model-process.mjs';
+
+          const { executable, version } = resolveCodexRuntime();
+          assert.equal(version, '0.170.0');
+          console.log('Verified codex-cli', version, 'at', executable);
+          '@ | node --input-type=module
+      - name: Run offline tests
+        run: npm test
