@@ -23,7 +23,7 @@
 npm test
 ```
 
-测试使用合成记录和本机接口，不访问图寻，也不调用模型。准备运行真实游戏时，先安装 Google Chrome，在项目根目录运行 `npm install --ignore-scripts` 安装固定的 Codex CLI 0.170.0，再运行 `npm run doctor` 核对 Codex 路径、版本和 Chrome 文件。已有 Codex 登录可复用，需要登录时运行 `.\node_modules\.bin\codex.cmd login`。网站计时和 Chrome 能否启动仍需自行确认。Chrome 安装在其他位置时可设置 `CHROME_PATH`。
+测试使用合成记录和本机接口，不访问图寻，也不调用模型。准备运行真实游戏时，先安装 Google Chrome，在项目根目录运行 `npm ci --ignore-scripts` 安装固定的 Codex CLI 0.170.0，再运行 `npm run doctor` 核对 Codex 路径、版本和 Chrome 文件。已有 Codex 登录可复用，需要登录时运行 `.\node_modules\.bin\codex.cmd login`。网站计时和 Chrome 能否启动仍需自行确认。Chrome 安装在其他位置时可设置 `CHROME_PATH`。
 
 ### 运行一局经典五题
 

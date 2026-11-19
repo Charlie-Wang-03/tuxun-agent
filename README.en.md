@@ -16,7 +16,7 @@ Offline tests run without installing dependencies. The tests use synthetic recor
 
 ## Run a game
 
-1. Install Google Chrome and run `npm install --ignore-scripts` in the project directory. Both entry points use the project-local Codex CLI 0.170.0. Run `npm run doctor` to verify the executable and version. To sign in if needed, use `.\node_modules\.bin\codex.cmd login`. It does not verify login. Set `CHROME_PATH` for a nonstandard Chrome installation.
+1. Install Google Chrome and run `npm ci --ignore-scripts` in the project directory. Both entry points use the project-local Codex CLI 0.170.0. Run `npm run doctor` to verify the executable and version. To sign in if needed, use `.\node_modules\.bin\codex.cmd login`. It does not verify login. Set `CHROME_PATH` for a nonstandard Chrome installation.
 2. Run `npm run browser`. In the dedicated Chrome window, sign in to the [map library](https://tuxun.fun/map), choose the mode and timer, and manually start the first game. Keep only the game tab open.
 3. Run `npm run dashboard` and open the local address it prints. Match the dashboard settings to the website before starting. Defaults are one game, five minutes and 35 actions per round, and 30 minutes per game.
 

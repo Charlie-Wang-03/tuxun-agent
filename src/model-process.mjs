@@ -12,7 +12,7 @@ export function resolveCodexRuntime({platform=process.platform, arch=process.arc
     `../node_modules/@openai/codex-win32-${arch}/vendor/${targets[arch]}/bin/codex.exe`, import.meta.url));
   const probe = spawn(executable, ['--version'], {encoding:'utf8', timeout:5000, windowsHide:true});
   if (probe.status !== 0 || probe.stdout.trim() !== `codex-cli ${version}`) {
-    throw Error(`需要项目本地 Codex CLI ${version}；请在项目根目录运行 npm install --ignore-scripts，再运行 npm run doctor`);
+    throw Error(`需要项目本地 Codex CLI ${version}；请在项目根目录运行 npm ci --ignore-scripts，再运行 npm run doctor`);
   }
   return {version, executable};
 }
