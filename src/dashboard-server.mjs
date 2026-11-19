@@ -6,7 +6,7 @@ import {createInterface} from 'node:readline';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import {captureFrame} from './dashboard-frame.mjs';
-import {parseRunOptions} from './run-options.mjs';
+import {DEFAULT_MODEL_CONFIG, MODEL_NAME_PATTERN, REASONING_EFFORTS, parseRunOptions} from './run-options.mjs';
 import {emptySummary, updateSummary} from './dashboard-summary.mjs';
 
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
@@ -60,7 +60,11 @@ export function createDashboardServer({launchWorker = args => fork(path.join(roo
       if (req.method === 'GET' && url.pathname === '/') {
         const html = await readFile(path.join(root, 'src', 'dashboard.html'), 'utf8');
         res.writeHead(200, {'content-type':'text/html; charset=utf-8', 'cache-control':'no-store', 'content-security-policy':"default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob:; connect-src 'self'; frame-ancestors 'none'", 'x-content-type-options':'nosniff'});
-        return res.end(html.replace('__DASHBOARD_TOKEN__', token));
+        const efforts = REASONING_EFFORTS.map(value => `<option${value === DEFAULT_MODEL_CONFIG.reasoning_effort ? ' selected' : ''}>${value}</option>`).join('');
+        return res.end(html.replace('__DASHBOARD_TOKEN__', token)
+          .replace('__DEFAULT_MODEL__', DEFAULT_MODEL_CONFIG.model)
+          .replace('__MODEL_PATTERN__', MODEL_NAME_PATTERN)
+          .replace('__EFFORT_OPTIONS__', efforts));
       }
       if (req.method === 'GET' && assets.has(url.pathname)) {
         const name = assets.get(url.pathname);
@@ -87,6 +91,8 @@ export function createDashboardServer({launchWorker = args => fork(path.join(roo
         const args = ['--mode', String(data.mode), '--round-seconds', String(data.roundSeconds), '--total-seconds', String(data.totalSeconds), '--max-actions', String(data.maxActions)];
         if (data.games != null) args.push('--games', String(data.games));
         if (data.initialRoundSeconds != null) args.push('--initial-round-seconds', String(data.initialRoundSeconds));
+        if (Object.hasOwn(data, 'model')) args.push('--model', data.model);
+        if (Object.hasOwn(data, 'reasoningEffort')) args.push('--reasoning-effort', data.reasoningEffort);
         parseRunOptions(args);
         events = []; lines = []; summary = emptySummary(); stopping = false; stopError = null; outcome = '正在启动'; runId = randomBytes(8).toString('hex');
         const child = launchWorker(args); worker = child;

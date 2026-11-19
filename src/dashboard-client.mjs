@@ -32,7 +32,7 @@ export function mountDashboard({token}) {
   $('closeLogs').onclick=()=>$('logsDialog').close();
   $('advancedButton').onclick=()=>$('advancedDialog').showModal();
   $('closeAdvanced').onclick=()=>$('advancedDialog').close();
-  $('actions').oninput=()=>{$('manualReady').checked=false;$('authorize').checked=false;refreshConfig();};
+  for (const id of ['actions','model','reasoningEffort']) $(id).oninput=()=>{$('manualReady').checked=false;$('authorize').checked=false;refreshConfig();};
   let replay = null, replayTimer = null, loadGeneration = 0, liveTimelineKey = '', replayTimelineKey = '';
 
   let currentError='', loadStatus=null;
@@ -53,15 +53,16 @@ export function mountDashboard({token}) {
   const statusFresh = () => connected && Date.now()-lastStatus < 7000;
   const frameFresh = () => lastFrame > 0 && !frameError && Date.now()-lastFrame < 7000;
   function config() {
-    return {mode:modes.find(input => input.checked)?.value || 'fixed', games:Number($('games').value), roundSeconds:minutesToSeconds($('round').value), totalSeconds:minutesToSeconds($('total').value), maxActions:Number($('actions').value)};
+    return {model:$('model').value, reasoningEffort:$('reasoningEffort').value, mode:modes.find(input => input.checked)?.value || 'fixed', games:Number($('games').value), roundSeconds:minutesToSeconds($('round').value), totalSeconds:minutesToSeconds($('total').value), maxActions:Number($('actions').value)};
   }
   function configText(c) {
-    return t`${t(modeNames[c.mode]) || t('未知模式')} · ${c.games} 局 / ${c.games*5} 题 · 每题 ${durationText(c.roundSeconds)} · 每局最多 ${durationText(c.totalSeconds)} · 每题 ${c.maxActions} 次操作`;
+    const budget = t`${t(modeNames[c.mode]) || t('未知模式')} · ${c.games} 局 / ${c.games*5} 题 · 每题 ${durationText(c.roundSeconds)} · 每局最多 ${durationText(c.totalSeconds)} · 每题 ${c.maxActions} 次操作`;
+    return `${budget} · ${t('请求模型')} ${c.model ?? t('未知')} / ${c.reasoningEffort ?? t('未知')}`;
   }
-  function configValid(c) {return Object.hasOwn(modeNames,c.mode) && [c.games,c.roundSeconds,c.totalSeconds,c.maxActions].every(n => Number.isSafeInteger(n) && n > 0);}
+  function configValid(c) {return $('model').validity.valid && Object.hasOwn(modeNames,c.mode) && [c.games,c.roundSeconds,c.totalSeconds,c.maxActions].every(n => Number.isSafeInteger(n) && n > 0);}
   function refreshConfig() {
     const c = config();
-    text('configSummary', configValid(c) ? configText(c) : t('请填写有效的正整数预算与局数。'));
+    text('configSummary', configValid(c) ? configText(c) : !$('model').validity.valid ? t('请输入有效的模型标识。') : t('请填写有效的正整数预算与局数。'));
     text('roundHint', configValid(c) ? t`每题 ${durationText(c.roundSeconds)}` : t('需要正整数分钟数'));
     text('totalHint', configValid(c) ? t`每局最多 ${durationText(c.totalSeconds)}，新局重置` : t('需要正整数分钟数'));
     $('start').disabled = view !== 'run' || !statusFresh() || !!snapshot?.running || startPending || !frameFresh() || !configValid(c) || !$('manualReady').checked || !$('authorize').checked;
@@ -71,6 +72,7 @@ export function mountDashboard({token}) {
     text('nextStep', offline ? t('选择本机运行目录，按局、题和事件查看记录。') :
       !statusFresh() ? t('等待本机服务恢复连接后再启动。') :
       !frameFresh() ? t('请在专用 Chrome 中手动登录图寻并开始经典五题。') :
+      !$('model').validity.valid ? t('请输入有效的模型标识。') :
       !configValid(c) ? t('请将局数和预算填写为有效的正整数。') :
       !$('manualReady').checked ? t('已取得预览；请核对右侧模式、网站计时和运行范围。') :
       !$('authorize').checked ? t('网页设置已人工确认；请核对真实选点与截图发送授权。') :
@@ -128,7 +130,7 @@ export function mountDashboard({token}) {
     text('stop',stopping?t('正在停止…'):snapshot?.stopError?t('重试停止'):t('停止运行'));
     $('replayFiles').disabled = running || startPending;
     $('changeReplay').disabled = running || startPending;
-    for (const node of [...modes,...['games','round','total','actions','manualReady','authorize'].map($)]) node.disabled = running || startPending;
+    for (const node of [...modes,...['games','round','total','actions','model','reasoningEffort','manualReady','authorize'].map($)]) node.disabled = running || startPending;
     $('newRun').hidden = running || !hasRun || configuring || view!=='run';
     $('setup').hidden = view !== 'run' || running || (hasRun && !configuring);
     $('replaySetup').hidden = view !== 'replay' || !!replay;
@@ -186,7 +188,7 @@ export function mountDashboard({token}) {
     renderSummary(summary);
     if (snapshot?.running && (snapshot.stopping || stopPending || summary.phase?.kind === 'stopped')) {text('phase',t('等待本地进程结束'));text('phaseOverview',t('等待本地进程结束'));}
     text('outcome',t(snapshot?.stopError) || (snapshot?.stopping?t('正在停止'):snapshot?.running?t('运行中'):t(snapshot?.outcome) || t('尚未启动')));
-    if(summary.started)text('runningConfig',configText({mode:summary.started.mode,...summary.started.limits}));
+    if(summary.started)text('runningConfig',configText({mode:summary.started.mode,...summary.started.limits,model:summary.started.request_config?.model,reasoningEffort:summary.started.request_config?.reasoning_effort}));
     else text('runningConfig',t('尚未收到运行配置记录'));
     if(!snapshot?.running && (summary.started || snapshot?.runId)) {
       text('endTitle',summary.started?t('本次运行已结束'):t('未能开始运行'));

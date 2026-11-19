@@ -147,7 +147,10 @@ try {
     target.webSocketDebuggerUrl=`ws://127.0.0.1:${port}/devtools/page/synthetic`;
     const file=path.join(workspace,'src','cli.mjs'),src=await readFile(file,'utf8');
     if(!src.includes('const port = 19365;'))throw Error('测试副本的调试端口定义已变化');
-    await writeFile(file,src.replace('const port = 19365;',`const port = ${port};`));
+    const runtimeCheck = 'const runtime = verifyCurrent ? null : resolveCodexRuntime();';
+    assert.ok(src.includes(runtimeCheck));
+    await writeFile(file,src.replace('const port = 19365;',`const port = ${port};`)
+      .replace(runtimeCheck, "const runtime = verifyCurrent ? null : {version:'simulated', executable:'offline-fixture'};"));
     if(evidenceFailure?.startsWith('write-')||evidenceFailure?.startsWith('read-')){
       const evidenceFile=path.join(workspace,'src','evidence.mjs'),evidenceSource=await readFile(evidenceFile,'utf8');
       const targets={
@@ -173,7 +176,7 @@ try {
       await writeFile(file,patched.replace(signature,signature+" if(message?.type==='test_signal'){process.emit(message.signal);if(process.connected)process.send({type:'stop_ack'});return;}"));
     }
     if(signalModel){
-      const patched=await readFile(file,'utf8'),signature='async function callCodex(prompt, images, schema, timeoutMs) {';
+      const patched=await readFile(file,'utf8'),signature='async function callCodex(runtime, modelConfig, prompt, images, schema, timeoutMs) {';
       assert.ok(patched.includes(signature));
       const injected=`
         const fakeAbort=new AbortController();activeModelAbort=fakeAbort;
@@ -190,12 +193,12 @@ try {
       await writeFile(file,patched.replace(signature,signature+' if(obj.kind==="stopped")throw Error("synthetic report write failure");'));
     }
     if(!auditDecision&&!signalModel&&!mapOnlyScenario){
-      const patched=await readFile(file,'utf8'),signature="const child=spawn('codex', args, { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });";
+      const patched=await readFile(file,'utf8'),signature="const child=spawn(runtime.executable, args, { cwd: root, windowsHide: true, stdio: ['ignore', 'pipe', 'pipe'] });";
       assert.ok(patched.includes(signature));
       await writeFile(file,patched.replace(signature,"throw Error('离线模拟禁止启动真实模型'); const child=null;"));
     }
     if(mapOnlyScenario){
-      const patched=await readFile(file,'utf8'),signature='async function callCodex(prompt, images, schema, timeoutMs) {';
+      const patched=await readFile(file,'utf8'),signature='async function callCodex(runtime, modelConfig, prompt, images, schema, timeoutMs) {';
       assert.ok(patched.includes(signature));
       const injected=`
         globalThis.syntheticCalls=(globalThis.syntheticCalls||0)+1;
@@ -208,7 +211,7 @@ try {
       await writeFile(file,patched.replace(signature,signature+injected));
     }
     if(auditDecision){
-      const patched=await readFile(file,'utf8'),signature='async function callCodex(prompt, images, schema, timeoutMs) {';
+      const patched=await readFile(file,'utf8'),signature='async function callCodex(runtime, modelConfig, prompt, images, schema, timeoutMs) {';
       assert.ok(patched.includes(signature));
       await writeFile(file,patched.replace(signature,signature+'\n  return {value:{type:"select_and_review",x:.5,y:.5,reason:"模拟地图选点",observation:"模拟可见道路",round:0},tokens:0};'));
     }
@@ -229,6 +232,9 @@ try {
   for(let i=0;i<800;i++){state=await status();if(state.events.some(e=>e.kind==='started') && (signalModel?fakeModelPid!==null:submitScenario||safetyScenario?!state.running:inputScenario?inputs.some(e=>e.type==='mousePressed'):methods.includes('Runtime.evaluate')))break;await delay(25)}
   assert.ok(state.events.some(e=>e.kind==='started'),'实际 CLI 应启动');
   if(mapOnlyScenario){
+    for (const event of state.events.filter(e=>['started','model_start','model_finished','model_failed'].includes(e.kind))) {
+      assert.deepEqual(event.request_config,{model:'gpt-6-astra',reasoning_effort:'high'});
+    }
     assert.deepEqual(syntheticInputs,[['step-000.png','compass-000.png','map-detail-000.png'],['map-detail-001.png'],['step-002.png','compass-002.png','map-detail-002.png'],['map-detail-003.png']]);
     const decisions=state.events.filter(e=>e.kind==='decision');
     assert.deepEqual(decisions.map(e=>e.screenshot),['step-000.png','map-detail-001.png','step-002.png']);

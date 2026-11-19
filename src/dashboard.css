@@ -1328,6 +1328,11 @@ dialog::backdrop {
   width:400px;
 }
 
+.advanced-dialog .fields {
+  grid-template-columns:minmax(0,2fr) minmax(0,1fr);
+  margin-bottom:12px;
+}
+
 .advanced-dialog label {
   display:grid;
   gap:7px;

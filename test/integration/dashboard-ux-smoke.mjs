@@ -174,7 +174,7 @@ try {
   await capture('01-preparation-laptop');
   await evaluate("document.querySelector('#advancedButton').focus()");await click('advancedButton');assert.equal(await evaluate("document.querySelector('#advancedDialog').open"),true);
   await select('languageToggle','en');await select('themeToggle','dark');
-  assert.match(await evaluate("document.querySelector('#advancedDialog').textContent"),/Action budget/);
+  assert.match(await evaluate("document.querySelector('#advancedDialog').textContent"),/Model and action budget/);
   await singleScreen('操作预算弹窗',['#advancedDialog']);
   await select('languageToggle','zh');await select('themeToggle','light');
   await page.call('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
@@ -189,10 +189,16 @@ try {
   await fill('round',0);assert.equal(await evaluate("document.querySelector('#start').disabled"),true);
   assert.equal(await evaluate("document.querySelector('#authorize').checked"),false);
   await fill('round',5);await fill('games',2);
+  assert.equal(await evaluate("document.getElementById('model').value"), 'gpt-6-astra');
+  assert.equal(await evaluate("document.getElementById('reasoningEffort').value"), 'high');
+  await click('advancedButton');
+  await fill('model','gpt-5.6-sol');
+  await fill('reasoningEffort','low');
+  await click('closeAdvanced');
   await evaluate("document.querySelector('input[value=\"fixed-view\"]').click()");
   await click('manualReady');await click('authorize');await click('start');await click('start');
   await wait("document.querySelector('#phase').textContent==='核对地图选点'",'运行开始');
-  assert.equal(launches,1,'连续启动不能创建多个运行');assert.ok(actualArgs.includes('fixed-view'));assert.equal(actualArgs[actualArgs.indexOf('--round-seconds')+1],'300');assert.equal(actualArgs[actualArgs.indexOf('--total-seconds')+1],'1800');
+  assert.equal(launches,1,'连续启动不能创建多个运行');assert.ok(actualArgs.includes('fixed-view'));assert.equal(actualArgs[actualArgs.indexOf('--model')+1],'gpt-5.6-sol');assert.equal(actualArgs[actualArgs.indexOf('--reasoning-effort')+1],'low');assert.equal(actualArgs[actualArgs.indexOf('--round-seconds')+1],'300');assert.equal(actualArgs[actualArgs.indexOf('--total-seconds')+1],'1800');
   assert.equal(await evaluate("document.querySelector('#setup').hidden"),true);
   assert.equal(await evaluate("document.querySelector('#replayFiles').disabled"),true);
   assert.match(await evaluate("document.querySelector('#observation').textContent"),/模拟观察/);

@@ -28,5 +28,8 @@
     "test:clean": "node test/integration/clean-smoke.mjs",
     "test:dual-remote": "node test/integration/dual-remote-smoke.mjs",
     "test:restart": "node test/integration/stop-smoke.mjs --restart-complete"
+  },
+  "dependencies": {
+    "@openai/codex": "0.170.0"
   }
 }

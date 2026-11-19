@@ -10,3 +10,12 @@ test('CLI 首题剩余预算不能超过对应单题预算',()=>{
   assert.throws(()=>parseRunOptions(['--max-actions','5','--initial-max-actions','6']),/首题剩余操作/);
   assert.equal(parseRunOptions(['--initial-round-seconds','20','--round-seconds','20']).limits.initialRoundSeconds,20);
 });
+
+test('模型和强度可独立覆盖，缺失或非法配置在启动前拒绝', () => {
+  const config = (...args) => parseRunOptions(args).modelConfig;
+  assert.deepEqual(config(), {model:'gpt-6-astra', reasoning_effort:'high'});
+  assert.deepEqual(config('--model','gpt-5.6-sol'), {model:'gpt-5.6-sol', reasoning_effort:'high'});
+  assert.deepEqual(config('--reasoning-effort','low'), {model:'gpt-6-astra', reasoning_effort:'low'});
+  for (const value of [undefined, '', '--help', 'a b', 'a\nb']) assert.throws(()=>config('--model',value), /--model/);
+  for (const value of [undefined, '', '--model', 'extra']) assert.throws(()=>config('--reasoning-effort',value), /--reasoning-effort/);
+});

@@ -17,19 +17,23 @@
 
 ### 先做离线检查
 
-在 Windows 上安装 Node.js 22 或以上版本，在项目根目录打开 PowerShell。项目没有 npm 依赖，直接运行：
+在 Windows 上安装 Node.js 22 或以上版本，在项目根目录打开 PowerShell。离线测试可直接运行：
 
 ```powershell
 npm test
 ```
 
-测试使用合成记录和本机接口，不访问图寻，也不调用模型。准备运行真实游戏时，再安装 Google Chrome、登录 Codex CLI，执行 `npm run doctor`。它检查版本和 Chrome 文件；登录状态、网站计时和 Chrome 能否启动仍需自行确认。Chrome 安装在其他位置时可设置 `CHROME_PATH`。
+测试使用合成记录和本机接口，不访问图寻，也不调用模型。准备运行真实游戏时，先安装 Google Chrome，在项目根目录运行 `npm install --ignore-scripts` 安装固定的 Codex CLI 0.170.0，再运行 `npm run doctor` 核对 Codex 路径、版本和 Chrome 文件。已有 Codex 登录可复用，需要登录时运行 `.\node_modules\.bin\codex.cmd login`。网站计时和 Chrome 能否启动仍需自行确认。Chrome 安装在其他位置时可设置 `CHROME_PATH`。
 
 ### 运行一局经典五题
 
 1. 运行 `npm run browser` 打开专用 Chrome。在[图寻题库](https://tuxun.fun/map)手动登录，选择模式、设置轮次时间并开始首局。保持单个游戏标签页，窗口足够大且未最小化。
 2. 运行 `npm run dashboard`，打开终端打印的本机地址。核对网页模式与计时、局数、单题时间及操作预算。默认一局，每题 5 分钟、35 次操作，每局 30 分钟；网站轮次时间应与单题预算相符。
 3. **在控制台确认并启动后，Agent 会提交真实选点。** 决策截图、观察、动作历史和核对目标会发送给已登录的 Codex CLI 后端，可能产生费用。需要结束时先在控制台停止，等运行退出后执行 `npm run stop` 关闭专用浏览器。[数据与报告安全](SECURITY.md)
+
+控制台和 CLI 默认向 Codex 请求 `gpt-6-astra`，推理强度为 `high`。可在启动前修改“请求模型”和“推理强度”，或在命令行传入 `--model gpt-5.6-sol --reasoning-effort low`。街景、地图及选点核对共用本次配置。
+
+2026-11-19 的合成图线上核验中，测试账号使用默认组合和 `gpt-6.2-astra / high` 均正确识别了颜色。10 个模型均接受 `low`、`medium`、`high`、`xhigh`，均拒绝 `minimal`。[各模型实测结果与版本差异](CONTRIBUTING.md#模型与推理强度兼容性)
 
 <details>
 <summary>使用 CLI、后台 Chrome 或连续多局</summary>
@@ -65,6 +69,8 @@ npm run run -- --mode fixed-view --games 2 --round-seconds 300 --total-seconds 1
 ```powershell
 npm run review
 ```
+
+事件文件 `events.jsonl` 在运行开始和每次模型调用的开始、完成或失败事件中保存 `request_config.model` 和 `request_config.reasoning_effort`。同一事件的 `codex_cli` 记录经过版本检查的项目本地可执行文件路径和版本。这两项请求参数表示发给 CLI 的配置，旧日志缺失时保持未知。
 
 CLI 按局、题列出得分、耗时、模型调用和兜底原因。要看某次动作对应的画面，在控制台的复盘页选择包含 `events.jsonl` 和截图的本地目录。两种方式都不访问游戏或调用模型。用量未知或统计口径混合时会标明，token 数不能直接换算费用。[回放操作与显示限制](test/UI_UX_ACCEPTANCE.md#控制台行为参考)
 

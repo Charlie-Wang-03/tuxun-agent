@@ -23,9 +23,9 @@ test('控制台使用模拟子进程启动、汇报状态并停止', async t => 
   const headers={'x-dashboard-token':token,'content-type':'application/json',origin:base};
   const tooLong=await fetch(base+'/api/start',{method:'POST',headers,body:JSON.stringify({confirm:true,mode:'fixed',roundSeconds:20,initialRoundSeconds:21,totalSeconds:60,maxActions:5})});
   assert.equal(tooLong.status,400);
-  const start=await fetch(base+'/api/start',{method:'POST',headers,body:JSON.stringify({confirm:true,mode:'fixed',games:2,roundSeconds:20,initialRoundSeconds:12,totalSeconds:60,maxActions:5})});
+  const start=await fetch(base+'/api/start',{method:'POST',headers,body:JSON.stringify({confirm:true,mode:'fixed',model:'gpt-5.6-sol',reasoningEffort:'low',games:2,roundSeconds:20,initialRoundSeconds:12,totalSeconds:60,maxActions:5})});
   assert.equal(start.status,202);
-  assert.deepEqual(actualArgs,['--mode','fixed','--round-seconds','20','--total-seconds','60','--max-actions','5','--games','2','--initial-round-seconds','12']);
+  assert.deepEqual(actualArgs,['--mode','fixed','--round-seconds','20','--total-seconds','60','--max-actions','5','--games','2','--initial-round-seconds','12','--model','gpt-5.6-sol','--reasoning-effort','low']);
   const status=async()=>(await(await fetch(base+'/api/status',{headers:{'x-dashboard-token':token}})).json());
   let state;
   for(let i=0;i<100;i++){state=await status();if(state.summary.state && state.lines.includes('分段中文输出'))break;await delay(20)}
